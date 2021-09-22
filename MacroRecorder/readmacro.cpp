@@ -28,6 +28,7 @@ bool isNumber(const std::string &str)
 }
 
 //function for lower level mouse movement
+//*Try make every input use this function. May help sync
 void mouse_move(int x, int y)
 {
 	INPUT    Input = { 0 };
@@ -56,7 +57,7 @@ void mouse_move(int x, int y)
 	*/
 }
 
-void ReadFromMouseFile()
+void ReadPosFile()
 {
 	INPUT    Input = { 0 };
 	ZeroMemory(&Input, sizeof(INPUT));
@@ -64,24 +65,21 @@ void ReadFromMouseFile()
 	int xPos{}, yPos{};
 
 	std::string line;
-	std::ifstream macrofile_MR("Mouserecord.csv");
+	std::string x{}, y{};
+	std::ifstream macrofile_RPF("Mouserecord.csv");
 
-	while (getline(macrofile_MR, line))
+	while (getline(macrofile_RPF, line))
 	{
-		std::stringstream ss(line);
-		std::string x{}, y{};
+		std::stringstream ss(line); //*Use int Stream if it exists
 
 		getline(ss, x, ',');
 		getline(ss, y, ',');
 
-		if (isNumber(x))
-		{
 			xPos = stoi(x);
 			yPos = stoi(y);
 
 			//SetCursorPos(xPos, yPos);
 			mouse_move(xPos, yPos);
-		}
 
 		std::cout << "X:" << xPos << " " << "Y:" << yPos << '\n';
 
@@ -91,70 +89,83 @@ void ReadFromMouseFile()
 		}
 		Sleep(15);
 	}
-	macrofile_MR.close();
+	macrofile_RPF.close();
 }
 
-void ReadFromKeyFile()
+void ReadKeyboardFile()
 {
 	INPUT    Input = { 0 };
 	ZeroMemory(&Input, sizeof(INPUT));
+	
+	float fC{};
+	int sC{}, tC{};
 
 	std::string line;
-	std::ifstream macrofile_KR("Keyrecord.csv");
+	std::ifstream macrofile_KBF("KeyboardFile.csv");
 
-	while (getline(macrofile_KR, line))
+	while (getline(macrofile_KBF, line))
 	{
-		std::stringstream ss(line);
-		std::string key{};
+		std::stringstream ss(line); //*Use int Stream if it exists
 
-		getline(ss, key);
+		std::string firstC{}, secondC{}, thirdC;
 
-		if (isNumber(key))
-		{
-			//needs fixing
-			Sleep(ceil(std::stof(key) * 1000));
-		}
+		getline(ss, firstC, ',');
+		getline(ss, secondC, ',');
+		getline(ss, thirdC, ',');
 
-		//Left MOUSE BUTTON
-		else if (key == "LMB_D")
-		{
-		Input.type = INPUT_MOUSE;
-		Input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+		fC = stof(firstC);
+		sC = strtol(secondC.c_str(), NULL, 16);
+		tC = strtol(thirdC.c_str(), NULL, 16);
+
+		Sleep(ceil(fC * 1000));
+
+		Input.type = INPUT_KEYBOARD;
+		Input.ki.wScan = sC;
+		Input.ki.dwFlags = tC;
 		SendInput(1, &Input, sizeof(INPUT));
-
-		//mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-		}
-		else if (key == "LMB_U")
-		{
-		Input.type = INPUT_MOUSE;
-		Input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
-		SendInput(1, &Input, sizeof(INPUT));
-
-		//mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
-		}
-		//SPACE KEY
-		else if (key == "SPACE_D")
-		{
-			Input.type = INPUT_KEYBOARD;
-			Input.ki.dwFlags = KEYEVENTF_UNICODE;
-			Input.ki.wScan = VK_SPACE;
-			SendInput(1, &Input, sizeof(INPUT));
-		}
-		else if (key == "SPACE_U")
-		{
-			Input.type = INPUT_KEYBOARD;
-			Input.ki.dwFlags = KEYEVENTF_KEYUP;
-			Input.ki.wScan = VK_SPACE;
-			SendInput(1, &Input, sizeof(INPUT));
-		}
-
-		//FILL IN KEYS
 
 		if (GetAsyncKeyState(VK_NUMPAD0))
 		{
 			break;
 		}
-		//Sleep(1);
 	}
-	macrofile_KR.close();
+	macrofile_KBF.close();
+}
+
+void ReadMouseFile()
+{
+	INPUT    Input = { 0 };
+	ZeroMemory(&Input, sizeof(INPUT));
+
+	float fC{};
+	int sC{};
+
+	std::string line;
+	std::ifstream macrofile_MF("MouseFile.csv");
+
+	std::string firstC{}, secondC{};
+
+	while (getline(macrofile_MF, line))
+	{
+		std::stringstream ss(line); //*Use int Stream if its exists
+
+		getline(ss, firstC, ',');
+		getline(ss, secondC, ',');
+
+		fC = stof(firstC);
+		sC = strtol(secondC.c_str(), NULL, 16);
+
+		Sleep(ceil(fC * 1000));
+
+		//*Create another function for this input like in readposfile. May help sync
+		Input.type = INPUT_MOUSE;
+		Input.mi.dwFlags = sC;
+		SendInput(1, &Input, sizeof(INPUT));
+
+		if (GetAsyncKeyState(VK_NUMPAD0))
+		{
+			break;
+		}
+	}
+	macrofile_MF.close();
 }

@@ -5,15 +5,17 @@
 #define MYHEADER_H
 
 //write
-void WriteMouseToFile();
-void WriteKeyToFile();
+void WritePosFile();
+void WriteMouseFile();
+void WriteKeyboardFile();
 
 
 //read
 bool isNumber(const std::string &str);
 bool mouse_move(int x, int y);
-void ReadFromMouseFile();
-void ReadFromKeyFile();
+void ReadPosFile();
+void ReadKeyboardFile();
+void ReadMouseFile();
 
 
 
