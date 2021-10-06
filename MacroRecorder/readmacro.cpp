@@ -96,7 +96,8 @@ void ReadKeyboardFile()
 {
 	INPUT    Input = { 0 };
 	ZeroMemory(&Input, sizeof(INPUT));
-	
+	Input.type = INPUT_KEYBOARD;
+
 	float fC{};
 	int sC{}, tC{};
 
@@ -119,7 +120,6 @@ void ReadKeyboardFile()
 
 		Sleep(ceil(fC * 1000));
 
-		Input.type = INPUT_KEYBOARD;
 		Input.ki.wScan = sC;
 		Input.ki.dwFlags = tC;
 		SendInput(1, &Input, sizeof(INPUT));
@@ -136,13 +136,13 @@ void ReadMouseFile()
 {
 	INPUT    Input = { 0 };
 	ZeroMemory(&Input, sizeof(INPUT));
+	Input.type = INPUT_MOUSE;
 
 	float fC{};
 	int sC{};
 
 	std::string line;
 	std::ifstream macrofile_MF("MouseFile.csv");
-
 	std::string firstC{}, secondC{};
 
 	while (getline(macrofile_MF, line))
@@ -157,8 +157,6 @@ void ReadMouseFile()
 
 		Sleep(ceil(fC * 1000));
 
-		//*Create another function for this input like in readposfile. May help sync
-		Input.type = INPUT_MOUSE;
 		Input.mi.dwFlags = sC;
 		SendInput(1, &Input, sizeof(INPUT));
 
